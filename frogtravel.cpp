@@ -16,27 +16,47 @@ int main() {
     ll n;
     cin >> n;
 
-    vi a(n);
-    for (int i = 0; i < n; i++) {
+    vi a(n+1);
+    for (int i = 1; i <= n; i++) {
         cin >> a[i];
     }
-    vi b(n);
-    for (int i = 0; i < n; i++) {
+    vi b(n+1);
+    for (int i = 1; i <= n; i++) {
         cin >> b[i];
     }
 
-    queue<pair<int, bool>> q;
+    vi dist(n+1, INF);
+    dist[n] = 0;
+    vi par(n + 1);
+    int j = n - 1;
 
-    q.push({n-1, 0});
-
-    vector<array<bool, 2>> vis(n, {false, false});
-    vis[n-1][0] = true;
-    while (!q.empty()) {
-        int top = q.front();
-        q.pop();
-
-        for (int i = top; )
+    for(int i = n; i > 0; i--) {
+        int x = max((ll)0, i + b[i] - a[i + b[i]]);
+        if (dist[i] == INF) continue;
+        while (j >= x) {
+            dist[j]=min(dist[j], dist[i] + 1);
+            par[j] = i;
+            j--;
+        }
     }
+
+    cout << (dist[0] == INF ? -1 : dist[0]) << endl;
+    if (dist[0] == INF) return 0;
+
+    int cur = 0;
+    vi path;
+    while(cur != n) {
+        path.push_back(cur);
+        cur = par[cur];
+    }
+
+    reverse(path.begin(), path.end());
+
+    for(int i : path) {
+        cout << i << " ";
+    }
+
+    cout << endl;
 
     return 0;
 }
