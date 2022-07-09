@@ -7,70 +7,93 @@ using vi = vector<ll>;
 using vpi = vector<pi>;
 using vb = vector<bool>;
 
+const ll mod = 1e9 + 7;
+
+void solve() {
+    ll n;
+    cin >> n;
+
+    string s;
+    string t;
+    cin >> s;
+    cin >> t;
+
+    reverse(s.begin(), s.end());
+    reverse(t.begin(), t.end());
+
+    s += '0';
+    t += '0';
+    n++;
+
+    vi psum(n + 1);
+    
+    for(int i = 0; i < n; i++) {
+        psum[i + 1] = psum[i] + (s[i] == '+');
+    }
+
+    vi psum2(n + 1);
+    
+    for(int i = 0; i < n; i++) {
+        psum2[i + 1] = psum2[i] + (t[i] == '+');
+    }
+
+    vi psum3(n + 1);
+    for (int i = 0; i < n; i++) {
+        psum3[i + 1] = psum3[i] + (s[i] == '0');
+    }
+
+    vi psum4(n + 1);
+    for (int i = 0; i < n; i++) {
+        psum4[i + 1] = psum4[i] + (t[i] == '0');
+    }
+
+    ll tot = 0;
+
+    vector<vi> dp(n + 1, vi(n + 1));
+
+    vector<vb> used(n + 1, vb(n + 1));
+
+    // might be wrong
+    dp[0][0] = 1;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            // move up on i
+            if (s[i] == '+' && psum3[i] == 0 && psum4[j] == 0) {
+                dp[psum[i + 1]][psum2[j]] += dp[psum[i]][psum2[j]];
+                dp[psum[i + 1]][psum2[j]] %= mod;
+                // tot += dp[i][j];
+                // tot %= mod;
+            } else if (s[i] == '0' && !used[psum[i]][psum2[j]] && psum3[i] == 0 && psum4[j] == 0) {
+                tot += dp[psum[i]][psum2[j]];
+                used[psum[i]][psum2[j]] = true;
+            }
+
+            // move up on j
+            if (t[j] == '+' && psum3[i] == 0 && psum4[j] == 0) {
+                dp[psum[i]][psum2[j + 1]] += dp[psum[i]][psum2[j]];
+                dp[psum[i]][psum2[j + 1]] %= mod;
+                // tot += dp[i][j];
+                // tot %= mod;
+            } else if (t[j] == '0' && !used[psum[i]][psum2[j]] && psum3[i] == 0 && psum4[j] == 0) {
+                tot += dp[psum[i]][psum2[j]];
+                used[psum[i]][psum2[j]] = true;
+            }
+        }
+    }
+
+    tot %= mod;
+    if (tot < 0) tot += mod;
+    cout << tot << endl;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    ll n, m;
-    cin >> n >> m;
-
-    vector<set<array<ll, 3>>> ch(m);
-    vpi p(n);
-
-    for (ll i = 0; i < n; i++) {
-        ll a, b;
-        cin >> a >> b;
-        a--, b--;
-        p[i] = {a, b};
-
-        ch[a].insert({b, i, 0});
-        ch[b].insert({a, i, 1});
-    }
-
-    vb vis(n);
-    vb done(m);
-    vi path;
-    ll ans = 0;
-
-    function<void(ll, bool)> dfs = [&](ll v, bool first) {
-        if (vis[v]) return;
-
-        vis[v] = true;
-        path.push_back(v + 1);
-
-        ll f = p[v].first;
-        ll s = p[v].second;
-
-        if(first && !done[f]) {
-            ans++;
-            done[f] = true;
-
-            for(auto i : ch[f]) {
-                if (i[1] == v) continue;
-                dfs(i[1], i[2]);
-            }
-        } else if(!done[s]) {
-            ans++;
-            done[s] = true;
-            
-            for(auto i : ch[s]) {
-                if (i[1] == v) continue;
-                dfs(i[1], i[2]);
-            }
-        }
-        
-    };
-
-    for (ll i = 0; i < n; i++) {
-        if (vis[i]) continue;
-        dfs(i, true);
-    }
-
-    cout << n - ans << endl;
-
-    for(ll i : path) {
-        cout << i << endl;
-    }
+    ll t;
+    cin >> t;
+    while(t--) solve();
 
     return 0;
 }

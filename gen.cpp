@@ -3,23 +3,25 @@ using namespace std;
 int rnd(int a, int b) {
     return a + rand() % (b - a + 1);
 }
-int main() {
-    srand(time(NULL));
 
-    int n = rnd(1, 10);
+int main(int argc, char *argv[]) {
+    srand(time(NULL) + stoi(argv[1]));
 
-    cout << n << endl;
+    int n = rnd(1, 1e5);
+    bool usingdup = rnd(1, 20) == 1;
+    int m = rnd(1, (usingdup ? 1e5 : (int)(1.2 * n)));
+    cout << n << " " << m << endl;
 
-    int lst = 2;
-    set<int> ys;
-    for (int i = 0; i < n; i++) {
-        int x = rnd(lst, 1e3 + lst);
+    vector<int> cnt(n+1, 2);
 
-        int y = rnd(1, x - 1);
-        while (ys.find(y) != ys.end()) y = rnd(1, x - 1);
-
-        lst = x + 1;
-
-        cout << x << " " << y << " " << rnd(0, 1) << endl;
+    for (int i = 0; i < m; i++) {
+        int v;
+	v = rnd(1, n);
+        while (cnt[v] == 0 && !usingdup) {
+		v = rnd(1, n);
+        }
+	cnt[v]--;
+        cout << v << (i == m - 1 ? "" : " ");
     }
+    cout << endl;
 }
